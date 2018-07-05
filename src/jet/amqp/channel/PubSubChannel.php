@@ -2,5 +2,5 @@
 
 namespace jet\amqp\channel;
 
-abstract class PubSubChannel extends Channel {
+abstract class PubSubChannel extends DefaultChannel {
 }

@@ -2,11 +2,11 @@
 
 namespace jet\amqp;
 
+use jet\amqp\channel\Channel;
 use jet\amqp\core\Consumer;
 use jet\amqp\core\Message;
 use PhpAmqpLib\Exception\AMQPExceptionInterface;
 use PhpAmqpLib\Message\AMQPMessage;
-use jet\amqp\channel\Channel;
 
 class Listener implements Consumer {
 
@@ -47,6 +47,7 @@ class Listener implements Consumer {
 			$this->prefetchCount,
 			null
 		);
+		$self = $this;
 		$this->consumerTag = $this->channel->getChannel()->basic_consume(
 			$this->channel->getQname(),
 			$consumerTag = '',// auto-generate
@@ -54,13 +55,13 @@ class Listener implements Consumer {
 			$this->autoAck,
 			$this->exclusive,
 			$noWait = false,
-			function ( AMQPMessage $amqpMessage ) use ( $handler ) {
+			function ( AMQPMessage $amqpMessage ) use ( $handler, &$self ) {
 				$message = new Message( unserialize( $amqpMessage->getBody() ) );
 				$message->setDeliveryTag( $amqpMessage->delivery_info['delivery_tag'] );
 				$message->setRedelivered( $amqpMessage->delivery_info['redelivered'] );
 				$message->setRoutingKey( $amqpMessage->delivery_info['routing_key'] );
 				if ( is_callable( $handler ) ) {
-					\call_user_func( $handler, $message, $this );
+					\call_user_func( $handler, $message, $self );
 				}
 			}
 		);

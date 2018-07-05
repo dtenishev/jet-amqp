@@ -11,6 +11,7 @@ class Message {
 	protected $consumerTag;
 	protected $redelivered;
 	protected $routingKey;
+	protected $priority;
 	protected $body;
 
 	public function __construct( $body = '' ) {
@@ -131,6 +132,20 @@ class Message {
 	 */
 	public function setRoutingKey( $routingKey ) {
 		$this->routingKey = $routingKey;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getPriority() {
+		return $this->priority;
+	}
+
+	/**
+	 * @param mixed $priority
+	 */
+	public function setPriority( $priority ) {
+		$this->priority = $priority;
 	}
 
 }
