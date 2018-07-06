@@ -1,6 +1,6 @@
 <?php
 
-namespace jet\amqp\core;
+namespace jetphp\rabbitmq\core;
 
 class Message {
 

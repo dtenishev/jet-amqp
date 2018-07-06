@@ -1,8 +1,8 @@
 <?php
 
-namespace jet\amqp\core;
+namespace jetphp\rabbitmq\core;
 
-use jet\amqp\channel\Channel;
+use jetphp\rabbitmq\channel\Channel;
 
 interface Consumer {
 

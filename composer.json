@@ -1,5 +1,5 @@
 {
-    "name": "dtenishev/jet-amqp",
+    "name": "dtenishev/jetphp-rabbitmq",
     "description": "AMQP php library wrapper. It's been tested against RabbitMQ.",
     "type": "library",
     "license": "Apache-2.0",
@@ -12,7 +12,7 @@
     "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
-            "jet\\amqp\\": "src/jet/amqp/"
+            "jetphp\\rabbitmq\\": "src/jetphp/rabbitmq/"
         }
     },
     "require": {

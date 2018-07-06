@@ -1,10 +1,10 @@
 <?php
 
-namespace jet\amqp;
+namespace jetphp\rabbitmq;
 
-use jet\amqp\channel\Channel;
-use jet\amqp\core\Consumer;
-use jet\amqp\core\Message;
+use jetphp\rabbitmq\channel\Channel;
+use jetphp\rabbitmq\core\Consumer;
+use jetphp\rabbitmq\core\Message;
 use PhpAmqpLib\Exception\AMQPExceptionInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 

@@ -1,10 +1,10 @@
 <?php
 
-namespace jet\amqp;
+namespace jetphp\rabbitmq;
 
-use jet\amqp\core\Message;
-use jet\amqp\core\Producer;
-use jet\amqp\channel\Channel;
+use jetphp\rabbitmq\core\Message;
+use jetphp\rabbitmq\core\Producer;
+use jetphp\rabbitmq\channel\Channel;
 use PhpAmqpLib\Message\AMQPMessage;
 
 class Dispatcher implements Producer {

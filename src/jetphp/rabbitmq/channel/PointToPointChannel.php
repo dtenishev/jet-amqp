@@ -1,6 +1,6 @@
 <?php
 
-namespace jet\amqp\channel;
+namespace jetphp\rabbitmq\channel;
 
 use PhpAmqpLib\Wire\AMQPTable;
 

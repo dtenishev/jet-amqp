@@ -1,6 +1,6 @@
 <?php
 
-namespace jet\amqp\channel;
+namespace jetphp\rabbitmq\channel;
 
 abstract class PubSubChannel extends DefaultChannel {
 }
