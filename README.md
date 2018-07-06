@@ -1,4 +1,4 @@
-jet-amqp
-========
+jetphp-rabbitmq
+===============
 
 AMQP php implementation (RabbitMQ version)
