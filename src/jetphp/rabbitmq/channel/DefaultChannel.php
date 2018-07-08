@@ -2,6 +2,7 @@
 
 namespace jetphp\rabbitmq\channel;
 
+use jetphp\rabbitmq\core\ChannelFeature;
 use PhpAmqpLib\Channel\AMQPChannel;
 
 abstract class DefaultChannel implements Channel {
@@ -10,12 +11,14 @@ abstract class DefaultChannel implements Channel {
 	protected $qname;
 	protected $xname;
 	protected $queueParams;
+	protected $feature;
 
-	public function __construct( AMQPChannel $channel, $qname, $xname, array $queueParams = array() ) {
+	public function __construct( AMQPChannel $channel, $qname, $xname, array $queueParams = array(), ChannelFeature $feature = null ) {
 		$this->channel = $channel;
 		$this->qname = $qname;
 		$this->xname = $xname;
 		$this->queueParams = $queueParams;
+		$this->feature = $feature;
 	}
 
 	/**
@@ -43,6 +46,16 @@ abstract class DefaultChannel implements Channel {
 
 	public function setQueueParam( $key, $value ) {
 		$this->queueParams[$key] = $value;
+	}
+
+	/**
+	 * @return ChannelFeature
+	 */
+	public function getFeature() {
+		if ( is_null( $this->feature ) ) {
+			$this->feature = new ChannelFeature();
+		}
+		return $this->feature;
 	}
 
 }

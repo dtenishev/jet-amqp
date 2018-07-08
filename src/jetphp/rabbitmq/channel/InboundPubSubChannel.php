@@ -5,24 +5,19 @@ namespace jetphp\rabbitmq\channel;
 class InboundPubSubChannel extends PubSubChannel {
 
 	public function bind() {
-		/**
-		 * @var bool $isExclusive
-		 *      true for private (accessible only by current connection and will be deleted after connection closes)
-		 *      false for shared
-		 */
 		list ( $qname ) = $this->channel->queue_declare(
 			'',
-			$isPassive = false,
-			$isDurable = false,
+			$this->getFeature()->isPassive(),
+			$this->getFeature()->isDurable(),
 			$isExclusive = true,
-			$autoDelete = false
+			$this->getFeature()->getAutoDelete()
 		);
 		$this->channel->exchange_declare(
 			$this->xname,
 			$type = 'fanout',
-			$isPassive = false,
-			$isDurable = false,
-			$autoDelete = false
+			$this->getFeature()->isPassive(),
+			$this->getFeature()->isDurable(),
+			$this->getFeature()->getAutoDelete()
 		);
 		$this->qname = $qname;
 		$this->channel->queue_bind( $this->qname, $this->xname );

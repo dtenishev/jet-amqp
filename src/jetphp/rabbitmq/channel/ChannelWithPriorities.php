@@ -4,13 +4,14 @@ namespace jetphp\rabbitmq\channel;
 
 use PhpAmqpLib\Channel\AMQPChannel;
 
-class PriorityChannel implements Channel {
+class ChannelWithPriorities implements Channel {
 
 	protected $parentChannel;
 	protected $maxPriority;
 
-	public function __construct( DefaultChannel $channel ) {
+	public function __construct( DefaultChannel $channel, $maxPriority = 0 ) {
 		$this->parentChannel = $channel;
+		$this->maxPriority = $maxPriority;
 	}
 
 	public function setMaxPriority( $maxPriority ) {

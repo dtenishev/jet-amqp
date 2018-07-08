@@ -8,9 +8,9 @@ class OutboundPubSubChannel extends PubSubChannel {
 		$this->channel->exchange_declare(
 			$this->xname,
 			$type = 'fanout',
-			$isPassive = false,
-			$isDurable = false,
-			$autoDelete = false
+			$this->getFeature()->isPassive(),
+			$this->getFeature()->isDurable(),
+			$this->getFeature()->getAutoDelete()
 		);
 	}
 

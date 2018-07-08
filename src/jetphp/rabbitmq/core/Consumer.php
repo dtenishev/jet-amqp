@@ -10,4 +10,9 @@ interface Consumer {
 
 	public function wait( $handler = null );
 
+	/**
+	 * @return Message|null
+	 */
+	public function directGet();
+
 }

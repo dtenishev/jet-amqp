@@ -5,6 +5,7 @@ namespace jetphp\rabbitmq;
 use jetphp\rabbitmq\channel\Channel;
 use jetphp\rabbitmq\core\Consumer;
 use jetphp\rabbitmq\core\Message;
+use jetphp\rabbitmq\util\MessageBuilder;
 use PhpAmqpLib\Exception\AMQPExceptionInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 
@@ -12,14 +13,16 @@ class Listener implements Consumer {
 
 	/** @var Channel */
 	protected $channel;
+	protected $messageBuilder;
 	protected $prefetchCount;
 	protected $autoAck;
 	protected $noLocal;
 	protected $exclusive;
 	protected $consumerTag;
 
-	public function __construct( $prefetchCount = 1, $autoAck = false, $noLocal = false, $exclusive = false ) {
+	public function __construct( MessageBuilder $messageBuilder, $prefetchCount = 1, $autoAck = false, $noLocal = false, $exclusive = false ) {
 		$this->channel = null;
+		$this->messageBuilder = $messageBuilder;
 		$this->prefetchCount = $prefetchCount;
 		$this->autoAck = $autoAck;
 		$this->noLocal = $noLocal;
@@ -55,15 +58,7 @@ class Listener implements Consumer {
 			$this->autoAck,
 			$this->exclusive,
 			$noWait = false,
-			function ( AMQPMessage $amqpMessage ) use ( $handler, &$self ) {
-				$message = new Message( unserialize( $amqpMessage->getBody() ) );
-				$message->setDeliveryTag( $amqpMessage->delivery_info['delivery_tag'] );
-				$message->setRedelivered( $amqpMessage->delivery_info['redelivered'] );
-				$message->setRoutingKey( $amqpMessage->delivery_info['routing_key'] );
-				if ( is_callable( $handler ) ) {
-					\call_user_func( $handler, $message, $self );
-				}
-			}
+			array( $this, 'onMessage' )
 		);
 		$interrupted = false;
 		while ( count( $this->channel->getChannel()->callbacks ) ) {
@@ -75,6 +70,30 @@ class Listener implements Consumer {
 			}
 		}
 		return $interrupted;
+	}
+
+	/**
+	 * @param AMQPMessage $amqpMessage
+	 * @param callable|null $handler
+	 */
+	public function onMessage( AMQPMessage $amqpMessage, $handler ) {
+		$message = $this->buildMessage( $amqpMessage );
+		if ( is_callable( $handler ) ) {
+			\call_user_func( $handler, $message, $this );
+		}
+	}
+
+	/**
+	 * @return Message|null
+	 */
+	public function directGet() {
+		$this->channel->bind();
+		/** @var AMQPMessage $amqpMessage */
+		$amqpMessage = $this->channel->getChannel()->basic_get( $this->channel->getQname(), $this->autoAck );
+		if ( !$amqpMessage ) {
+			return null;
+		}
+		return $this->buildMessage( $amqpMessage );
 	}
 
 	public function ackMessage( Message $message ) {
@@ -106,6 +125,23 @@ class Listener implements Consumer {
 
 	public function stop() {
 		$this->channel->getChannel()->basic_cancel( $this->consumerTag, false, true );
+	}
+
+	/**
+	 * @param AMQPMessage $amqpMessage
+	 * @return Message
+	 */
+	protected function buildMessage( AMQPMessage $amqpMessage ) {
+		$this->messageBuilder
+			->setBody( unserialize( $amqpMessage->getBody() ) )
+			->setDeliveryTag( $amqpMessage->get( 'delivery_tag' ) )
+			->setRedelivered( $amqpMessage->get( 'redelivered' ) )
+			->setRoutingKey( $amqpMessage->get( 'routing_key' ) )
+		;
+		if ( $amqpMessage->has( 'priority' ) ) {
+			$this->messageBuilder->setPriority( $amqpMessage->get( 'priority' ) );
+		}
+		return $this->messageBuilder->build();
 	}
 
 }
