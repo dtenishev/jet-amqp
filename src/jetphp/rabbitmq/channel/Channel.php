@@ -2,6 +2,7 @@
 
 namespace jetphp\rabbitmq\channel;
 
+use jetphp\rabbitmq\core\ChannelFeature;
 use PhpAmqpLib\Channel\AMQPChannel;
 
 interface Channel {
@@ -25,5 +26,10 @@ interface Channel {
 	 * @return void
 	 */
 	public function bind();
+
+	/**
+	 * @return ChannelFeature
+	 */
+	public function getFeature();
 
 }

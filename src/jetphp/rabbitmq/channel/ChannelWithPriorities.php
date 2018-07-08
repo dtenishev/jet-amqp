@@ -2,6 +2,7 @@
 
 namespace jetphp\rabbitmq\channel;
 
+use jetphp\rabbitmq\core\ChannelFeature;
 use PhpAmqpLib\Channel\AMQPChannel;
 
 class ChannelWithPriorities implements Channel {
@@ -47,4 +48,10 @@ class ChannelWithPriorities implements Channel {
 		$this->parentChannel->bind();
 	}
 
+	/**
+	 * @return ChannelFeature
+	 */
+	public function getFeature() {
+		return $this->parentChannel->getFeature();
+	}
 }
