@@ -12,6 +12,7 @@ class Listener extends AbstractConsumer implements \jetphp\rabbitmq\core\Listene
 	protected $noLocal;
 	protected $exclusive;
 	protected $consumerTag;
+	protected $messageHandler;
 
 	public function __construct( MessageBuilder $messageBuilder, $prefetchCount = 1, $autoAck = false, $noLocal = false, $exclusive = false ) {
 		parent::__construct( $messageBuilder, $autoAck );
@@ -30,6 +31,7 @@ class Listener extends AbstractConsumer implements \jetphp\rabbitmq\core\Listene
 		if ( !$this->channel ) {
 			throw new \RuntimeException( 'No Channel' );
 		}
+		$this->messageHandler = $handler;
 		$this->channel->bind();
 		// setup quality of service
 		$this->channel->getChannel()->basic_qos(
@@ -55,6 +57,7 @@ class Listener extends AbstractConsumer implements \jetphp\rabbitmq\core\Listene
 				break;
 			}
 		}
+		$this->messageHandler = null;
 		return $interrupted;
 	}
 
@@ -62,10 +65,10 @@ class Listener extends AbstractConsumer implements \jetphp\rabbitmq\core\Listene
 	 * @param AMQPMessage $amqpMessage
 	 * @param callable|null $handler
 	 */
-	public function onMessage( AMQPMessage $amqpMessage, $handler ) {
+	public function onMessage( AMQPMessage $amqpMessage ) {
 		$message = $this->buildMessage( $amqpMessage );
-		if ( is_callable( $handler ) ) {
-			\call_user_func( $handler, $message, $this );
+		if ( is_callable( $this->messageHandler ) ) {
+			\call_user_func( $this->messageHandler, $message, $this );
 		}
 	}
 
