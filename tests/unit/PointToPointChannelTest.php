@@ -3,15 +3,13 @@
 namespace jetphp\rabbitmq\tests\unit;
 
 use jetphp\rabbitmq\channel\PointToPointChannel;
-use jetphp\rabbitmq\channel\ChannelWithPriorities;
-use jetphp\rabbitmq\core\Message;
 use jetphp\rabbitmq\Dispatcher;
 use jetphp\rabbitmq\Listener;
 use jetphp\rabbitmq\util\ReusableMessageBuilder;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PHPUnit\Framework\TestCase;
 
-class ChannelWithPrioritiesTest extends TestCase {
+class PointToPointChannelTest extends TestCase {
 
 	protected function getStreamConnection() {
 		return new AMQPStreamConnection(
@@ -41,35 +39,27 @@ class ChannelWithPrioritiesTest extends TestCase {
 	}
 
 	public function testPriority() {
-		$maxPriority = 3;
 		$maxMessages = 10;
-		$qname = 'jetphp.rabbitmq.tests.unit.channel_with_priorities';
+		$qname = 'jetphp.rabbitmq.tests.unit.point_to_point_channel';
 		$connection = $this->getStreamConnection();
 		$dispatcher = $this->getDispatcher();
 		$messageBuilder = new ReusableMessageBuilder();
 		$listener = $this->getListener( $messageBuilder );
 		$pointToPointChannel = $this->getPointToPointChannel( $connection, 1, $qname, '' );
 		$pointToPointChannel->getFeature()->setExclusive( true );
-		$channelWithPriorities = new ChannelWithPriorities( $pointToPointChannel, $maxPriority );
-		$dispatcher->bind( $channelWithPriorities );
-		$listener->bind( $channelWithPriorities );
+		$dispatcher->bind( $pointToPointChannel );
+		$listener->bind( $pointToPointChannel );
 		$sent = 0;
 		for ( $n = 0; $n < $maxMessages; $n++ ) {
-			$messagePriority = rand( 1, $maxPriority );
 			$dispatcher->send( $messageBuilder
-				->setBody( 'Message with priority ' . $messagePriority )
-				->setPriority( $messagePriority )
+				->setBody( 'Message #' . ($n+1) )
 				->build() );
 			$sent++;
 		}
 
-		$recentPriority = $maxPriority;
 		$recv = 0;
 		for ( $n = 0; $n < $maxMessages; $n++ ) {
 			$message = $listener->directGet();
-			$messagePriority = $message->getProperties()->getPriority();
-			$this->assertLessThanOrEqual( $recentPriority, $messagePriority, 'Invalid message received, expected priority=' . $recentPriority . ', got priority=' . $messagePriority );
-			$recentPriority = $messagePriority;
 			$recv++;
 		}
 		$this->assertEquals( $sent, $recv, 'Sent/recv message count mismatch' );

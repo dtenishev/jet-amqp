@@ -6,7 +6,7 @@ use jetphp\rabbitmq\core\Message;
 
 class MessageBuilder {
 
-	protected $issuerId;
+	protected $appId;
 	protected $messageId;
 	protected $isPersistent;
 	protected $deliveryTag;
@@ -22,24 +22,24 @@ class MessageBuilder {
 
 	public function build() {
 		$obj = $this->createMessage();
-		$obj->setIssuerId( $this->issuerId );
-		$obj->setMessageId( $this->messageId );
-		$obj->setIsPersistent( $this->isPersistent );
+		$obj->getProperties()->setAppId( $this->appId );
+		$obj->getProperties()->setMessageId( $this->messageId );
+		$obj->getProperties()->setIsPersistent( $this->isPersistent );
+		$obj->getProperties()->setPriority( $this->priority );
 		$obj->setDeliveryTag( $this->deliveryTag );
 		$obj->setConsumerTag( $this->consumerTag );
 		$obj->setRedelivered( $this->redelivered );
 		$obj->setRoutingKey( $this->routingKey );
-		$obj->setPriority( $this->priority );
 		$obj->setBody( $this->body );
 		return $obj;
 	}
 
 	/**
-	 * @param mixed $issuerId
+	 * @param mixed $appId
 	 * @return MessageBuilder
 	 */
-	public function setIssuerId( $issuerId ) {
-		$this->issuerId = $issuerId;
+	public function setAppId( $appId ) {
+		$this->appId = $appId;
 		return $this;
 	}
 

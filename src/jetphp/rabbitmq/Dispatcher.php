@@ -26,14 +26,12 @@ class Dispatcher implements Producer {
 		}
 		$this->channel->bind();
 		$amqpMessageProperties = array(
-			'app_id' => getmypid(),
+			'app_id' => $message->getProperties()->getAppId(),
 			'timestamp' => microtime( 1 ) * 1000000,
-			'message_id' => $message->getMessageId(),
-			'delivery_mode' => $message->isPersistent() ? AMQPMessage::DELIVERY_MODE_PERSISTENT : AMQPMessage::DELIVERY_MODE_NON_PERSISTENT,
+			'message_id' => $message->getProperties()->getMessageId(),
+			'delivery_mode' => $message->getProperties()->isPersistent() ? AMQPMessage::DELIVERY_MODE_PERSISTENT : AMQPMessage::DELIVERY_MODE_NON_PERSISTENT,
+			'priority' => $message->getProperties()->getPriority(),
 		);
-		if ( is_numeric( $message->getPriority() ) ) {
-			$amqpMessageProperties['priority'] = $message->getPriority();
-		}
 		$amqpMessage = new AMQPMessage( serialize( $message->getBody() ), $amqpMessageProperties );
 		$this->channel->getChannel()->basic_publish(
 			$amqpMessage,
