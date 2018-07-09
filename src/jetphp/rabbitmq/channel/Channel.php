@@ -23,9 +23,10 @@ interface Channel {
 	public function getXname();
 
 	/**
+	 * @param bool $forced
 	 * @return void
 	 */
-	public function bind();
+	public function bind( $forced = false );
 
 	/**
 	 * @return ChannelFeature

@@ -4,7 +4,13 @@ namespace jetphp\rabbitmq\channel;
 
 class OutboundPubSubChannel extends PubSubChannel {
 
-	public function bind() {
+	/**
+	 * @param bool $forced
+	 */
+	public function bind( $forced = false ) {
+		if ( $this->binded && !$forced ) {
+			return;
+		}
 		$this->channel->exchange_declare(
 			$this->xname,
 			$type = 'fanout',
@@ -12,6 +18,7 @@ class OutboundPubSubChannel extends PubSubChannel {
 			$this->getFeature()->isDurable(),
 			$this->getFeature()->getAutoDelete()
 		);
+		$this->binded = true;
 	}
 
 }

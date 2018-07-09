@@ -6,7 +6,13 @@ use PhpAmqpLib\Wire\AMQPTable;
 
 class PointToPointChannel extends DefaultChannel {
 
-	public function bind() {
+	/**
+	 * @param bool $forced
+	 */
+	public function bind( $forced = false ) {
+		if ( $this->binded && !$forced ) {
+			return;
+		}
 		$this->channel->queue_declare(
 			$this->qname,
 			$this->getFeature()->isPassive(),
@@ -16,6 +22,7 @@ class PointToPointChannel extends DefaultChannel {
 			false,
 			new AMQPTable( $this->queueParams )
 		);
+		$this->binded = true;
 	}
 
 }

@@ -12,6 +12,7 @@ abstract class DefaultChannel implements Channel {
 	protected $xname;
 	protected $queueParams;
 	protected $feature;
+	protected $binded;
 
 	public function __construct( AMQPChannel $channel, $qname, $xname, array $queueParams = array(), ChannelFeature $feature = null ) {
 		$this->channel = $channel;
@@ -19,6 +20,7 @@ abstract class DefaultChannel implements Channel {
 		$this->xname = $xname;
 		$this->queueParams = $queueParams;
 		$this->feature = $feature;
+		$this->binded = false;
 	}
 
 	/**
@@ -28,7 +30,10 @@ abstract class DefaultChannel implements Channel {
 		return $this->channel;
 	}
 
-	abstract public function bind();
+	/**
+	 * @param bool $forced
+	 */
+	abstract public function bind( $forced = false );
 
 	/**
 	 * @return mixed

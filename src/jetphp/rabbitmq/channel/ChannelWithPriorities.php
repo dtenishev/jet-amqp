@@ -40,12 +40,15 @@ class ChannelWithPriorities implements Channel {
 		return $this->parentChannel->getXname();
 	}
 
-	public function bind() {
+	/**
+	 * @param bool $forced
+	 */
+	public function bind( $forced = false ) {
 		if ( !$this->maxPriority ) {
 			throw new \RuntimeException( 'Undefined max priority' );
 		}
 		$this->parentChannel->setQueueParam( 'x-max-priority', $this->maxPriority );
-		$this->parentChannel->bind();
+		$this->parentChannel->bind( $forced );
 	}
 
 	/**
@@ -54,4 +57,5 @@ class ChannelWithPriorities implements Channel {
 	public function getFeature() {
 		return $this->parentChannel->getFeature();
 	}
+
 }

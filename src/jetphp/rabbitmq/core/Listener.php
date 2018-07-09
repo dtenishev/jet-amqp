@@ -4,13 +4,10 @@ namespace jetphp\rabbitmq\core;
 
 use jetphp\rabbitmq\channel\Channel;
 
-interface Consumer {
+interface Listener {
 
 	public function bind( Channel $channel );
 
-	/**
-	 * @return Message|null
-	 */
-	public function get();
+	public function wait( $handler = null );
 
 }

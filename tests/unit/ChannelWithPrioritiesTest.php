@@ -4,6 +4,7 @@ namespace jetphp\rabbitmq\tests\unit;
 
 use jetphp\rabbitmq\channel\PointToPointChannel;
 use jetphp\rabbitmq\channel\ChannelWithPriorities;
+use jetphp\rabbitmq\Consumer;
 use jetphp\rabbitmq\core\Message;
 use jetphp\rabbitmq\Dispatcher;
 use jetphp\rabbitmq\Listener;
@@ -40,6 +41,10 @@ class ChannelWithPrioritiesTest extends TestCase {
 		return new Listener( $messageBuilder, $prefetchCount, $autoAck, $noLocal, $exclusive );
 	}
 
+	protected function getConsumer( $messageBuilder, $autoAck = true ) {
+		return new Consumer( $messageBuilder, $autoAck );
+	}
+
 	public function testPriority() {
 		$maxPriority = 3;
 		$maxMessages = 10;
@@ -47,12 +52,12 @@ class ChannelWithPrioritiesTest extends TestCase {
 		$connection = $this->getStreamConnection();
 		$dispatcher = $this->getDispatcher();
 		$messageBuilder = new ReusableMessageBuilder();
-		$listener = $this->getListener( $messageBuilder );
+		$consumer = $this->getConsumer( $messageBuilder );
 		$pointToPointChannel = $this->getPointToPointChannel( $connection, 1, $qname, '' );
 		$pointToPointChannel->getFeature()->setExclusive( true );
 		$channelWithPriorities = new ChannelWithPriorities( $pointToPointChannel, $maxPriority );
 		$dispatcher->bind( $channelWithPriorities );
-		$listener->bind( $channelWithPriorities );
+		$consumer->bind( $channelWithPriorities );
 		$sent = 0;
 		for ( $n = 0; $n < $maxMessages; $n++ ) {
 			$messagePriority = rand( 1, $maxPriority );
@@ -66,7 +71,8 @@ class ChannelWithPrioritiesTest extends TestCase {
 		$recentPriority = $maxPriority;
 		$recv = 0;
 		for ( $n = 0; $n < $maxMessages; $n++ ) {
-			$message = $listener->directGet();
+			$message = $consumer->get();
+			$this->assertInstanceOf( 'jetphp\\rabbitmq\\core\\Message', $message, 'Invalid message received, got ' . gettype( $message ) );
 			$messagePriority = $message->getProperties()->getPriority();
 			$this->assertLessThanOrEqual( $recentPriority, $messagePriority, 'Invalid message received, expected priority=' . $recentPriority . ', got priority=' . $messagePriority );
 			$recentPriority = $messagePriority;

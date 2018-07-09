@@ -3,6 +3,7 @@
 namespace jetphp\rabbitmq\tests\unit;
 
 use jetphp\rabbitmq\channel\PointToPointChannel;
+use jetphp\rabbitmq\Consumer;
 use jetphp\rabbitmq\Dispatcher;
 use jetphp\rabbitmq\Listener;
 use jetphp\rabbitmq\util\ReusableMessageBuilder;
@@ -38,17 +39,21 @@ class PointToPointChannelTest extends TestCase {
 		return new Listener( $messageBuilder, $prefetchCount, $autoAck, $noLocal, $exclusive );
 	}
 
+	protected function getConsumer( $messageBuilder, $autoAck = true ) {
+		return new Consumer( $messageBuilder, $autoAck );
+	}
+
 	public function testPriority() {
 		$maxMessages = 10;
 		$qname = 'jetphp.rabbitmq.tests.unit.point_to_point_channel';
 		$connection = $this->getStreamConnection();
 		$dispatcher = $this->getDispatcher();
 		$messageBuilder = new ReusableMessageBuilder();
-		$listener = $this->getListener( $messageBuilder );
+		$consumer = $this->getConsumer( $messageBuilder );
 		$pointToPointChannel = $this->getPointToPointChannel( $connection, 1, $qname, '' );
 		$pointToPointChannel->getFeature()->setExclusive( true );
 		$dispatcher->bind( $pointToPointChannel );
-		$listener->bind( $pointToPointChannel );
+		$consumer->bind( $pointToPointChannel );
 		$sent = 0;
 		for ( $n = 0; $n < $maxMessages; $n++ ) {
 			$dispatcher->send( $messageBuilder
@@ -59,7 +64,8 @@ class PointToPointChannelTest extends TestCase {
 
 		$recv = 0;
 		for ( $n = 0; $n < $maxMessages; $n++ ) {
-			$message = $listener->directGet();
+			$message = $consumer->get();
+			$this->assertInstanceOf( 'jetphp\\rabbitmq\\core\\Message', $message, 'Invalid message received, got ' . gettype( $message ) );
 			$recv++;
 		}
 		$this->assertEquals( $sent, $recv, 'Sent/recv message count mismatch' );
