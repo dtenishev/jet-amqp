@@ -14,11 +14,11 @@ class PointToPointChannelTest extends TestCase {
 
 	protected function getStreamConnection() {
 		return new AMQPStreamConnection(
-			JETPHP_RABBITMQ_TESTS_HOST,
-			JETPHP_RABBITMQ_TESTS_PORT,
-			JETPHP_RABBITMQ_TESTS_USER,
-			JETPHP_RABBITMQ_TESTS_PASS,
-			JETPHP_RABBITMQ_TESTS_VHOST
+			\jetphp\rabbitmq\tests\HOST,
+			\jetphp\rabbitmq\tests\PORT,
+			\jetphp\rabbitmq\tests\USER,
+			\jetphp\rabbitmq\tests\PASS,
+			\jetphp\rabbitmq\tests\VHOST
 		);
 	}
 
