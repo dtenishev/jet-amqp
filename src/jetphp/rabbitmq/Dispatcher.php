@@ -16,13 +16,13 @@ class Dispatcher implements Producer {
 		$this->channel = null;
 	}
 
-	public function bind( Channel $channel ) {
+	public function attach( Channel $channel ) {
 		$this->channel = $channel;
 	}
 
 	public function send( Message $message ) {
 		if ( !$this->channel ) {
-			throw new \RuntimeException( 'No Channel' );
+			throw new \RuntimeException( 'No channel attached' );
 		}
 		$this->channel->bind();
 		$amqpMessageProperties = array(

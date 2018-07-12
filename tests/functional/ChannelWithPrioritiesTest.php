@@ -55,7 +55,7 @@ class ChannelWithPrioritiesTest extends TestCase {
 		$pointToPointChannel = $this->getPointToPointChannel( $connection, 1, $qname, '' );
 		$pointToPointChannel->getFeature()->setExclusive( true );
 		$channelWithPriorities = new ChannelWithPriorities( $pointToPointChannel, $maxPriority );
-		$dispatcher->bind( $channelWithPriorities );
+		$dispatcher->attach( $channelWithPriorities );
 		$consumer->attach( $channelWithPriorities );
 		$sent = 0;
 		for ( $n = 0; $n < $maxMessages; $n++ ) {

@@ -6,7 +6,7 @@ use jetphp\rabbitmq\channel\Channel;
 
 interface Producer {
 
-	public function bind( Channel $channel );
+	public function attach( Channel $channel );
 
 	public function send( Message $message );
 

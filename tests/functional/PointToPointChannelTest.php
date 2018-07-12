@@ -52,7 +52,7 @@ class PointToPointChannelTest extends TestCase {
 		$consumer = $this->getConsumer( $messageBuilder );
 		$pointToPointChannel = $this->getPointToPointChannel( $connection, 1, $qname, '' );
 		$pointToPointChannel->getFeature()->setExclusive( true );
-		$dispatcher->bind( $pointToPointChannel );
+		$dispatcher->attach( $pointToPointChannel );
 		$consumer->attach( $pointToPointChannel );
 		$sent = 0;
 		for ( $n = 0; $n < $maxMessages; $n++ ) {

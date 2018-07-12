@@ -61,7 +61,7 @@ class PubSubChannelTest extends TestCase {
 		$outboundChannel = $this->getOutboundPubSubChannel( $connection, 1, $qname, $xname );
 		$outboundChannel->getFeature()->setAutoDelete( true );
 		$dispatcher = $this->getDispatcher();
-		$dispatcher->bind( $outboundChannel );
+		$dispatcher->attach( $outboundChannel );
 		$inboundChannel1 = $this->getInboundPubSubChannel( $connection, 1, $qname, $xname );
 		$inboundChannel1->getFeature()->setExclusive( true )->setAutoDelete( true );
 		$inboundChannel2 = $this->getInboundPubSubChannel( $connection, 1, $qname, $xname );
