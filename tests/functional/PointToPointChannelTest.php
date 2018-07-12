@@ -1,6 +1,6 @@
 <?php
 
-namespace jetphp\rabbitmq\tests\unit;
+namespace jetphp\rabbitmq\tests\functional;
 
 use jetphp\rabbitmq\channel\PointToPointChannel;
 use jetphp\rabbitmq\Consumer;

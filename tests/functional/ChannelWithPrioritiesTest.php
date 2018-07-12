@@ -1,11 +1,10 @@
 <?php
 
-namespace jetphp\rabbitmq\tests\unit;
+namespace jetphp\rabbitmq\tests\functional;
 
 use jetphp\rabbitmq\channel\PointToPointChannel;
 use jetphp\rabbitmq\channel\ChannelWithPriorities;
 use jetphp\rabbitmq\Consumer;
-use jetphp\rabbitmq\core\Message;
 use jetphp\rabbitmq\Dispatcher;
 use jetphp\rabbitmq\Listener;
 use jetphp\rabbitmq\util\ReusableMessageBuilder;
