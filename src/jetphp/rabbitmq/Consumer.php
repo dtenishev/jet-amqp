@@ -19,6 +19,9 @@ class Consumer extends AbstractConsumer implements \jetphp\rabbitmq\core\Consume
 	 * @return Message|null
 	 */
 	public function get() {
+		if ( !$this->channel ) {
+			throw new \RuntimeException( 'No channel attached' );
+		}
 		$this->channel->bind();
 		/** @var AMQPMessage $amqpMessage */
 		$amqpMessage = $this->channel->getChannel()->basic_get( $this->channel->getQname(), $this->autoAck );

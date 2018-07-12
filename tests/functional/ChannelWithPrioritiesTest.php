@@ -47,7 +47,7 @@ class ChannelWithPrioritiesTest extends TestCase {
 	public function testPriority() {
 		$maxPriority = 3;
 		$maxMessages = 10;
-		$qname = 'jetphp.rabbitmq.tests.unit.channel_with_priorities';
+		$qname = 'jetphp.rabbitmq.tests.functional.channel_with_priorities';
 		$connection = $this->getStreamConnection();
 		$dispatcher = $this->getDispatcher();
 		$messageBuilder = new ReusableMessageBuilder();
@@ -56,7 +56,7 @@ class ChannelWithPrioritiesTest extends TestCase {
 		$pointToPointChannel->getFeature()->setExclusive( true );
 		$channelWithPriorities = new ChannelWithPriorities( $pointToPointChannel, $maxPriority );
 		$dispatcher->bind( $channelWithPriorities );
-		$consumer->bind( $channelWithPriorities );
+		$consumer->attach( $channelWithPriorities );
 		$sent = 0;
 		for ( $n = 0; $n < $maxMessages; $n++ ) {
 			$messagePriority = rand( 1, $maxPriority );

@@ -6,7 +6,7 @@ use jetphp\rabbitmq\channel\Channel;
 
 interface Consumer {
 
-	public function bind( Channel $channel );
+	public function attach( Channel $channel );
 
 	/**
 	 * @return Message|null

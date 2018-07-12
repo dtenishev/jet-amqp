@@ -45,7 +45,7 @@ class PointToPointChannelTest extends TestCase {
 
 	public function testPriority() {
 		$maxMessages = 10;
-		$qname = 'jetphp.rabbitmq.tests.unit.point_to_point_channel';
+		$qname = 'jetphp.rabbitmq.tests.functional.point_to_point_channel';
 		$connection = $this->getStreamConnection();
 		$dispatcher = $this->getDispatcher();
 		$messageBuilder = new ReusableMessageBuilder();
@@ -53,7 +53,7 @@ class PointToPointChannelTest extends TestCase {
 		$pointToPointChannel = $this->getPointToPointChannel( $connection, 1, $qname, '' );
 		$pointToPointChannel->getFeature()->setExclusive( true );
 		$dispatcher->bind( $pointToPointChannel );
-		$consumer->bind( $pointToPointChannel );
+		$consumer->attach( $pointToPointChannel );
 		$sent = 0;
 		for ( $n = 0; $n < $maxMessages; $n++ ) {
 			$dispatcher->send( $messageBuilder

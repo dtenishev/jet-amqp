@@ -6,8 +6,18 @@ use jetphp\rabbitmq\channel\Channel;
 
 interface Listener {
 
-	public function bind( Channel $channel );
+	public function attach( Channel $channel );
 
-	public function wait( $handler = null );
+	/**
+	 * @param $handler
+	 * @throws \InvalidArgumentException
+	 */
+	public function setMessageHandler( /*callable */$handler );
+
+	/**
+	 * @param int $timeout in seconds, 0 means no timeout
+	 * @return mixed
+	 */
+	public function wait( $timeout = 0 );
 
 }

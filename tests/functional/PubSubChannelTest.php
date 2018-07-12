@@ -55,7 +55,7 @@ class PubSubChannelTest extends TestCase {
 
 	public function testPubSubChannel() {
 		$qname = '';
-		$xname = 'jetphp.rabbitmq.tests.unit.pub_sub_channel';
+		$xname = 'jetphp.rabbitmq.tests.functional.pub_sub_channel';
 		$connection = $this->getStreamConnection();
 		$messageBuilder = new MessageBuilder();
 		$outboundChannel = $this->getOutboundPubSubChannel( $connection, 1, $qname, $xname );
@@ -68,12 +68,11 @@ class PubSubChannelTest extends TestCase {
 		$inboundChannel2->getFeature()->setExclusive( true )->setAutoDelete( true );
 		$consumer1 = $this->getConsumer( $messageBuilder );
 		$consumer2 = $this->getConsumer( $messageBuilder );
-		$consumer1->bind( $inboundChannel1 );
-		$consumer2->bind( $inboundChannel2 );
+		$consumer1->attach( $inboundChannel1 );
+		$consumer2->attach( $inboundChannel2 );
 
-		// following calls are made to bind take effect due to subscribers must be declared before any message will be published
-		$consumer1->get();
-		$consumer2->get();
+		$inboundChannel1->bind();
+		$inboundChannel2->bind();
 
 		$dispatcher->send( $messageBuilder->setBody( 'PubSub Message' )->setIsPersistent( false )->build() );
 

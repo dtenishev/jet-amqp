@@ -20,7 +20,7 @@ abstract class AbstractConsumer {
 		$this->autoAck = $autoAck;
 	}
 
-	public function bind( Channel $channel ) {
+	public function attach( Channel $channel ) {
 		$this->channel = $channel;
 	}
 
