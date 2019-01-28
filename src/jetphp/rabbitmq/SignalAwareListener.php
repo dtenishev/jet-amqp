@@ -11,22 +11,25 @@ use PhpAmqpLib\Message\AMQPMessage;
 class SignalAwareListener extends Listener {
 
 	protected $handler;
+	protected $catchSignals;
 	protected $lastSignal;
 
 	public function __construct(
+		/*callable */$handler,
+		array $catchSignals,
 		MessageBuilder $messageBuilder,
 		$prefetchCount = 1,
 		$autoAck = false,
 		$noLocal = false,
-		$exclusive = false,
-		/*callable */$handler = null
+		$exclusive = false
 	) {
 		parent::__construct( $messageBuilder, $prefetchCount, $autoAck, $noLocal, $exclusive );
-		$this->handler = $handler;
-		$this->lastSignal = null;
-		if ( !is_null( $handler ) && !is_callable( $handler ) ) {
+		if ( !is_callable( $handler ) ) {
 			throw new \InvalidArgumentException( 'Expected callable for signal handler' );
 		}
+		$this->handler = $handler;
+		$this->catchSignals = $catchSignals;
+		$this->lastSignal = null;
 		$this->configureSignalHandling();
 	}
 
@@ -37,7 +40,14 @@ class SignalAwareListener extends Listener {
 	 */
 	public function wait( $timeout = 0 ) {
 		$interrupted = parent::wait( $timeout );
+		if ( $interrupted && extension_loaded( 'pcntl' ) && function_exists( 'pcntl_signal_dispatch' ) ) {
+			pcntl_signal_dispatch();
+		}
 		return !is_null( $this->lastSignal ) ? true : $interrupted;
+	}
+
+	public function getLastSignal() {
+		return $this->lastSignal;
 	}
 
 	public function onSignal( $signo ) {
@@ -49,10 +59,9 @@ class SignalAwareListener extends Listener {
 		if ( !is_callable( $this->handler ) || !extension_loaded( 'pcntl' ) ) {
 			return;
 		}
-		pcntl_signal(SIGTERM, array( $this, 'onSignal' ) );
-		pcntl_signal(SIGQUIT, array( $this, 'onSignal' ) );
-		pcntl_signal(SIGHUP, array( $this, 'onSignal' ) );
-		pcntl_signal(SIGINT, array( $this, 'onSignal' ) );
+		foreach ( $this->catchSignals as $signo ) {
+			pcntl_signal( $signo, array( $this, 'onSignal' ), false );
+		}
 	}
 
 }

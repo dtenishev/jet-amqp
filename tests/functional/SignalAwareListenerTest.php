@@ -31,7 +31,7 @@ class SignalAwareListenerTest extends TestCase {
 	}
 
 	protected function getListener( $messageBuilder, $prefetchCount = 1, $autoAck = true, $noLocal = false, $exclusive = false ) {
-		return new SignalAwareListener( $messageBuilder, $prefetchCount, $autoAck, $noLocal, $exclusive, array( $this, 'cancelListener' ) );
+		return new SignalAwareListener( array( $this, 'cancelListener' ), array( \SIGINT ), $messageBuilder, $prefetchCount, $autoAck, $noLocal, $exclusive );
 	}
 
 	protected function getMessageBuilder() {
@@ -48,15 +48,16 @@ class SignalAwareListenerTest extends TestCase {
 	}
 
 	public function testSignalAwareListener() {
-		$this->configureAlarmHandler();
+//		$this->configureAlarmHandler();
 		$qname = 'jetphp.rabbitmq.tests.functional.signalAwareListener';
-		$waitTimeout = 2;
+		$waitTimeout = 3;
 		$connection = $this->getStreamConnection();
 		$pointToPointChannel = $this->getPointToPointChannel( $connection, 1, $qname, '' );
 		$listener = $this->getListener( $this->getMessageBuilder(), 1 );
 		$listener->attach( $pointToPointChannel );
 		$interrupted = $listener->wait( $waitTimeout );
-		$this->assertTrue( $interrupted === true, 'Listener wasn\'t interrupted' );
+		$this->assertTrue( $interrupted, 'Listener wasn\'t interrupted' );
+		$this->assertEquals( \SIGINT, $listener->getLastSignal(), 'Listener wasn\'t interrupted by proper signal' );
 	}
 
 	private function configureAlarmHandler() {
