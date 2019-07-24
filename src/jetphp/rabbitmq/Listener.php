@@ -60,14 +60,23 @@ class Listener extends AbstractConsumer implements \jetphp\rabbitmq\core\Listene
 			array( $this, 'onMessage' )
 		);
 		$interrupted = false;
-		while ( count( $this->channel->getChannel()->callbacks ) ) {
+		$canDispatchPcntlSignal = extension_loaded( 'pcntl' )
+			&& function_exists( 'pcntl_signal_dispatch' );
+		$stop = false;
+		while ( count( $this->channel->getChannel()->callbacks ) && !$stop ) {
 			try {
 				$this->channel->getChannel()->wait( null, $timeout > 0, $timeout );
 			} catch ( AMQPTimeoutException $ex ) {
-				break;
+				$stop = true;
 			} catch ( AMQPExceptionInterface $ex ) {
 				$interrupted = true;
-				break;
+				$stop = true;
+			} catch ( \ErrorException $ex ) {
+				$interrupted = true;
+				$stop = true;
+			}
+			if ( $canDispatchPcntlSignal ) {
+				\pcntl_signal_dispatch();
 			}
 		}
 		return $interrupted;
