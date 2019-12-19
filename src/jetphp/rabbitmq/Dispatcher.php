@@ -32,6 +32,12 @@ class Dispatcher implements Producer {
 			'delivery_mode' => $message->getProperties()->isPersistent() ? AMQPMessage::DELIVERY_MODE_PERSISTENT : AMQPMessage::DELIVERY_MODE_NON_PERSISTENT,
 			'priority' => $message->getProperties()->getPriority(),
 		);
+		if ( $message->getProperties()->getReplyTo() ) {
+			$amqpMessageProperties['reply_to'] = $message->getProperties()->getReplyTo();
+		}
+		if ( $message->getProperties()->getCorrelationId() ) {
+			$amqpMessageProperties['correlation_id'] = $message->getProperties()->getCorrelationId();
+		}
 		$amqpMessage = new AMQPMessage( serialize( $message->getBody() ), $amqpMessageProperties );
 		$this->channel->getChannel()->basic_publish(
 			$amqpMessage,
