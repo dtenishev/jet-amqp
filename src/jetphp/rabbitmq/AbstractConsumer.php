@@ -66,6 +66,14 @@ abstract class AbstractConsumer {
 			$this->messageBuilder
 				->setPriority( $amqpMessage->get( 'priority' ) );
 		}
+		if ( $amqpMessage->has( 'reply_to' ) ) {
+			$this->messageBuilder
+				->setReplyTo( $amqpMessage->get( 'reply_to' ) );
+		}
+		if ( $amqpMessage->has( 'correlation_id' ) ) {
+			$this->messageBuilder
+				->setCorrelationId( $amqpMessage->get( 'correlation_id' ) );
+		}
 		return $this->messageBuilder->build();
 	}
 
